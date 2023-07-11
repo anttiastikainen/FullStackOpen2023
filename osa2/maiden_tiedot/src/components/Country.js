@@ -1,10 +1,8 @@
-
-const Country = ({ country}) => {
+const Country = ({ country , handleClick}) => {
     return (
         <li>
         {country.name}
-        
-        <button onClick={console.log("show country information here")}>{`show`}</button>
+        <button onClick={() => handleClick()}>{`show`}</button>
         </li>
     )
 }
