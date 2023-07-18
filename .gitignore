@@ -135,3 +135,6 @@ dist
 ./osa1/unicafe\node_modules
 ./osa2/puhelinluettelo\node_modules
 ./osa3/node_modules
+./osa3/.env
+./osa4/node_modules
+./osa4/.env
