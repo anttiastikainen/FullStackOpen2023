@@ -43,6 +43,26 @@ test('blog posts id:s are defined', async() => {
     }
 })
 
+test('Posting blogs works', async() => {
+const newBlog = {
+    title: 'Test blog',
+    author: 'Teppo Testaaja',
+    url: 'www.test.fi',
+    likes: 3
+}
+
+await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+const blogsAtEnd = await helper.blogsInDb()
+expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length +1)
+expect(blogsAtEnd[blogsAtEnd.length - 1].title).toBe('Test blog')
+    
+})
+
 afterAll(async () => {
     await mongoose.connection.close()
 })

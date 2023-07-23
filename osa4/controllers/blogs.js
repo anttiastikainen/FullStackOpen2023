@@ -16,7 +16,7 @@ blogsRouter.post('', async (request, response) => {
         url: body.url
     })
     const savedBlog = await blog.save()
-    response.json(savedBlog)
+    response.status(201).json(savedBlog)
 })
     blogsRouter.get('/:id', async (request, response) => {
         const blog = await Blog.findById(request.params.id)
