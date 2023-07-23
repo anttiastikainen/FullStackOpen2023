@@ -6,10 +6,6 @@ const app = require('../app')
 const api = supertest(app)
 const Blog = require('../models/blog')
 
-const logger = require('../utils/logger')
-const config = require('../utils/config')
-
-
 beforeEach(async () => {
     await Blog.deleteMany({})
     await Blog.insertMany(helper.initialBlogs)
@@ -31,7 +27,20 @@ test('All blog posts are returned', async() => {
 test('First blog post is written by Teppo Testaaja', async () => {
     const response = await api.get('/api/blogs/')
 
-expect(response.body[0].author).toBe('Teppo Testaaja')
+    expect(response.body[0].author).toBe('Teppo Testaaja')
+})
+
+test('blog posts id:s are defined', async() => {
+    const response = await api
+        .get('/api/blogs')
+        .expect(200)
+
+    const ids = response.body.map(r => r.id)
+
+    for(let i = 0; i<ids.length;i++)
+    {
+        expect(ids[i]).toBeDefined()
+    }
 })
 
 afterAll(async () => {

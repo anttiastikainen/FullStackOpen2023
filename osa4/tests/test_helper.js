@@ -18,6 +18,11 @@ const initialBlogs = [
         author: 'Jamiroquai',
         url: '-',
         likes: 3
+    },
+    {
+        title: 'bad blog',
+        url: '-',
+        likes: 6
     }
 ]
 
