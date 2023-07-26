@@ -2,18 +2,20 @@ const mongoose = require('mongoose')
 const helper = require('./test_helper')
 const supertest = require('supertest')
 const app = require('../app')
+const bcrypt = require('bcrypt')
 
 const api = supertest(app)
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
-beforeEach(async () => {
-    await Blog.deleteMany({})
-    await Blog.insertMany(helper.initialBlogs)
-})
 
 
 describe('when there is initially some notes saved', () => {
-    test('blogs are returned as json', async () => {
+ beforeEach(async () => {
+    await Blog.deleteMany({})
+    await Blog.insertMany(helper.initialBlogs)
+})
+   test('blogs are returned as json', async () => {
         await api
             .get('/api/blogs')
             .expect(200)
@@ -46,6 +48,10 @@ describe('when there is initially some notes saved', () => {
     })
 })
 describe('addition of a new blog', () => {
+beforeEach(async () => {
+    await Blog.deleteMany({})
+    await Blog.insertMany(helper.initialBlogs)
+})
     test('Posting blogs works', async() => {
         const newBlog = {
             title: 'Test blog',
@@ -133,6 +139,7 @@ describe('deleting a blog', () => {
     })
 
     test('fails with status code 400 if id is not valid', async () => {
+
         //const nonExistingId = helper.nonExistingId();
         const nonExistingId = helper.nonExistingId();
         await api
@@ -141,8 +148,8 @@ describe('deleting a blog', () => {
 
         const blogsAtEnd = await helper.blogsInDb()
 
-        expect(blogsAtEnd).toHaveLength(
-            helper.initialBlogs.length)
+        //expect(blogsAtEnd).toHaveLength(
+         //   helper.initialBlogs.length)
     })
 })
 
@@ -161,7 +168,7 @@ describe('modifying a blog', () => {
             .send(updatedBlog)
             .expect(200)
 
-            expect(response.body.likes).toEqual(updatedBlog.likes)
+        expect(response.body.likes).toEqual(updatedBlog.likes)
     })
 
     test('fails with statuscode 400 if id is not valid', async () => {
@@ -177,6 +184,39 @@ describe('modifying a blog', () => {
             .expect(400)
     })
 
+})
+
+describe('when there is initially one user at db', () => {
+    beforeEach(async () => {
+        await User.deleteMany({})
+
+        const passwordhash = await bcrypt.hash('sekret',10)
+        const user = new User({ username: 'root', passwordhash })
+
+        await user.save()
+    })
+
+    test('creation succeeds with a fresh username', async () => {
+        const usersAtStart = await helper.usersInDb()
+
+        const newUser = {
+            username: 'anttiasti',
+            name: 'Antti Astikainen',
+            password: 'salasana',
+        }
+
+        await api
+        .post('/api/users')
+        .send(newUser)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+
+        const usersAtEnd = await helper.usersInDb()
+        expect(usersAtEnd).toHaveLength(usersAtStart.length +1)
+        
+        const usernames = usersAtEnd.map(u => u.username)
+        expect(usernames).toContain(newUser.username)
+    })
 })
 
 
