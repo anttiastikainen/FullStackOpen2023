@@ -5,18 +5,25 @@ const User = require('../models/user')
 usersRouter.post('/', async (request, response) => {
     const { username, name, password } = request.body
 
-    const saltRounds = 10
-    const passwordHash = await bcrypt.hash(password, saltRounds)
+// prevent creating new user if password is not given or too short
+    if(request.body.password === undefined || request.body.password.length < 3){
+        response.status(400).json({error: `password not given, or it is too short (less than 3 characters)`}).end()
+    }
+    else
+    {
+        const saltRounds = 10
+        const passwordHash = await bcrypt.hash(password, saltRounds)
 
-    const user = new User ({
-        username,
-        name,
-        passwordHash,
-    })
+        const user = new User ({
+            username,
+            name,
+            passwordHash,
+        })
 
-    const savedUser = await user.save()
+        const savedUser = await user.save()
 
-    response.status(201).json(savedUser)
+        response.status(201).json(savedUser)
+    }
 
 })
 

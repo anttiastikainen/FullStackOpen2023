@@ -239,6 +239,29 @@ describe('when there is initially one user at db', () => {
             const usersAtEnd = await helper.usersInDb()
             expect(usersAtEnd).toHaveLength(usersAtStart.length)
         })
+
+    test('creating fails with proper statuscode and message if username is too short',
+        async () => {
+            const usersAtStart = await helper.usersInDb()
+
+            const newUser = {
+                username: 'root',
+                name: 'Superuser',
+                password: 'sa',
+            }
+
+            const result = await api
+            .post('/api/users')
+            .send(newUser)
+            .expect(400)
+            .expect('Content-Type', /application\/json/)
+
+            expect(result.body.error).toContain('password not given, or it is too short (less than 3 characters)')
+            
+            const usersAtEnd = await helper.usersInDb()
+            expect(usersAtEnd).toHaveLength(usersAtStart.length)
+        })
+ // TODO : testi käyttäjänimen pituuden testaamiseen ja tyhjään salasanaan   
 })
 
 
