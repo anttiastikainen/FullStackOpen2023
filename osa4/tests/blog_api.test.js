@@ -3,6 +3,7 @@ const helper = require('./test_helper')
 const supertest = require('supertest')
 const app = require('../app')
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 
 const api = supertest(app)
 const Blog = require('../models/blog')
@@ -47,25 +48,44 @@ describe('when there is initially some notes saved', () => {
         }
     })
 })
-describe('addition of a new blog', () => {
+describe('addition of a new blog', () => {        // We need test user for creating new blogs
+
     beforeEach(async () => {
         await Blog.deleteMany({})
-        await Blog.insertMany(helper.initialBlogs)
+        await Blog.insertMany(helper.initialBlogs) 
     })
+
+
     test('Posting blogs works', async() => {
+        const user = {
+            username: 'testuser',
+            name: 'test',
+            password: 'testpassword'
+        }
+
+        const response = await api.post('/api/users').send(user)
+            .expect(201)
+
+        const userForToken = {
+            username: user.username,
+            id: response.body.id
+        }
+
+        const token = jwt.sign(userForToken, process.env.SECRET)
+
         const newBlog = {
             title: 'Test blog',
             author: 'Teppo Testaaja',
             url: 'www.test.fi',
             likes: 2
         }
-
         await api
             .post('/api/blogs')
             .send(newBlog)
+            .set('Authorization',`Bearer ${token}`)
+            .set('Content-Type', 'application/json')
+            .set('Content-Length', JSON.stringify(newBlog).length)
             .expect(201)
-            .expect('Content-Type', /application\/json/)
-
         const blogsAtEnd = await helper.blogsInDb()
         expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length +1)
         expect(blogsAtEnd[blogsAtEnd.length - 1].title).toBe('Test blog')
@@ -73,18 +93,38 @@ describe('addition of a new blog', () => {
     })
 
     test('If like count is not given, it is set to 0', async() => {
+        const user = {
+            username: 'testuser2',
+            name: 'test',
+            password: 'testpassword'
+        }
+
+        const response = await api.post('/api/users').send(user)
+            .expect(201)
+
+        const userForToken = {
+            username: user.username,
+            id: response.body.id
+        }
+
+        const token = jwt.sign(userForToken, process.env.SECRET)
+
         const newBlog2 = {
-            title: 'No likes blog',
+            title: 'Test blog',
             author: 'Teppo Testaaja',
             url: 'www.test.fi',
         }
-
         await api
             .post('/api/blogs')
             .send(newBlog2)
+            .set('Authorization',`Bearer ${token}`)
+            .set('Content-Type', 'application/json')
+            .set('Content-Length', JSON.stringify(newBlog2).length)
             .expect(201)
 
+
         const blogsAtEnd = await helper.blogsInDb()
+
         expect(blogsAtEnd[blogsAtEnd.length - 1].likes).toBe(0)
     })
 
@@ -262,7 +302,7 @@ describe('when there is initially one user at db', () => {
             expect(usersAtEnd).toHaveLength(usersAtStart.length)
         })
 
-     test('creating fails with proper statuscode and message if password is too short',
+    test('creating fails with proper statuscode and message if password is too short',
         async () => {
             const usersAtStart = await helper.usersInDb()
 
@@ -284,7 +324,7 @@ describe('when there is initially one user at db', () => {
             expect(usersAtEnd).toHaveLength(usersAtStart.length)
         })
 
-   test('creating fails with proper statuscode and message if password is not defined ',
+    test('creating fails with proper statuscode and message if password is not defined ',
         async () => {
             const usersAtStart = await helper.usersInDb()
 
