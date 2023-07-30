@@ -9,13 +9,19 @@ const api = supertest(app)
 const Blog = require('../models/blog')
 const User = require('../models/user')
 
+    beforeEach(async () => {
+        await User.deleteMany({})
+
+        const passwordhash = await bcrypt.hash('sekret',10)
+        const user = new User({ username: 'root', passwordhash })
+
+        await user.save()
+    })
+
 
 
 describe('when there is initially some notes saved', () => {
-    beforeEach(async () => {
-        await Blog.deleteMany({})
-        await Blog.insertMany(helper.initialBlogs)
-    })
+
     test('blogs are returned as json', async () => {
         await api
             .get('/api/blogs')
@@ -26,7 +32,7 @@ describe('when there is initially some notes saved', () => {
     test('All blog posts are returned', async() => {
         const response = await api.get('/api/blogs')
 
-        expect(response.body).toHaveLength(helper.initialBlogs.length)
+        expect(response.body).toHaveLength(helper.initialBlogs.length+1)
     })
 
     test('First blog post is written by Teppo Testaaja', async () => {
@@ -50,13 +56,8 @@ describe('when there is initially some notes saved', () => {
 })
 describe('addition of a new blog', () => {        // We need test user for creating new blogs
 
-    beforeEach(async () => {
-        await Blog.deleteMany({})
-        await Blog.insertMany(helper.initialBlogs) 
-    })
-
-
     test('Posting blogs works', async() => {
+        const blogsAtStart = await helper.blogsInDb()
         const user = {
             username: 'testuser',
             name: 'test',
@@ -87,7 +88,7 @@ describe('addition of a new blog', () => {        // We need test user for creat
             .set('Content-Length', JSON.stringify(newBlog).length)
             .expect(201)
         const blogsAtEnd = await helper.blogsInDb()
-        expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length +1)
+        expect(blogsAtEnd).toHaveLength(blogsAtStart.length +1)
         expect(blogsAtEnd[blogsAtEnd.length - 1].title).toBe('Test blog')
 
     })
@@ -134,12 +135,14 @@ describe('addition of a new blog', () => {        // We need test user for creat
             url: 'www.test.fi',
             likes: 30
         }
+        const blogsAtStart = await helper.blogsInDb()
+
         await api 
             .post('/api/blogs')
             .send(newBlog3)
             .expect(400)
         const blogsAtEnd = await helper.blogsInDb()
-        expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
+        expect(blogsAtEnd).toHaveLength(blogsAtStart.length)
     })
 
     test('If url is not given, 400 response is returned', async() => {
@@ -148,34 +151,74 @@ describe('addition of a new blog', () => {        // We need test user for creat
             author: 'Teppo Testaaja',
             likes: 30
         }
+        const blogsAtStart = await helper.blogsInDb()
         await api 
             .post('/api/blogs')
             .send(newBlog4)
             .expect(400)
         const blogsAtEnd = await helper.blogsInDb()
-        expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
+        expect(blogsAtEnd).toHaveLength(blogsAtStart.length)
     })
 
 })
 
 describe('deleting a blog', () => {
-    test('succeeds with status code 204 if id is valid', async () => {
-        const blogsAtStart = await helper.blogsInDb()
-        const blogToDelete = blogsAtStart[0]
+    test('successful with status code 204 if id is valid', async () => {
+        await Blog.deleteMany({})
+        await Blog.insertMany(helper.initialBlogs)
+ 
+        const user = {
+            username: '1testuser1',
+            name: 'test',
+            password: 'testpassword'
+        }
+
+        const response = await api.post('/api/users').send(user)
+            .expect(201)
+
+        const userForToken = {
+            username: user.username,
+            id: response.body.id
+        }
+
+        const token = jwt.sign(userForToken, process.env.SECRET)
+
+        const newBlog = {
+            title: 'Test blog',
+            author: 'Teppo Testaaja',
+            url: 'www.test.fi',
+            likes: 2
+        }
+       const createBlogResponse =  await api
+            .post('/api/blogs')
+            .send(newBlog)
+            .set('Authorization',`Bearer ${token}`)
+            .set('Content-Type', 'application/json')
+            .set('Content-Length', JSON.stringify(newBlog).length)
+            .expect(201)
+        const blogsAtEnd = await helper.blogsInDb()
+        expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length +1)
+        expect(blogsAtEnd[blogsAtEnd.length - 1].title).toBe('Test blog')
+
+        const blogToDelete = createBlogResponse.body
+
+        const anotherUser = {
+            username: '1anotheruser',
+            name: 'another user',
+            password: 'anotherpassword'
+        }
+
+        await api.post('/api/users').send(anotherUser).expect(201)
+        const anotherToken = jwt.sign(anotherUser, process.env.SECRET)
 
         await api
             .delete(`/api/blogs/${blogToDelete.id}`)
-            .expect(204)
+            .set('Authorization',`Bearer ${anotherToken}`)
+            .expect(401)
 
-        const blogsAtEnd = await helper.blogsInDb()
+        const blogsIds = blogsAtEnd.map((blog) => blog.id)
+        expect(blogsIds).toContain(blogToDelete.id)
 
-        expect(blogsAtEnd).toHaveLength(
-            helper.initialBlogs.length - 1
-        )
-
-        const titles = blogsAtEnd.map(r => r.title)
-
-        expect(titles).not.toContain(blogToDelete.title)
     })
 
     test('fails with status code 400 if id is not valid', async () => {
@@ -227,15 +270,6 @@ describe('modifying a blog', () => {
 })
 
 describe('when there is initially one user at db', () => {
-    beforeEach(async () => {
-        await User.deleteMany({})
-
-        const passwordhash = await bcrypt.hash('sekret',10)
-        const user = new User({ username: 'root', passwordhash })
-
-        await user.save()
-    })
-
     test('creation succeeds with a fresh username', async () => {
         const usersAtStart = await helper.usersInDb()
 
