@@ -54,25 +54,10 @@ describe('when there is initially some notes saved', () => {
         }
     })
 })
-describe('addition of a new blog', () => {        // We need test user for creating new blogs
-
+describe('addition of a new blog', () => {       
     test('Posting blogs works', async() => {
         const blogsAtStart = await helper.blogsInDb()
-        const user = {
-            username: 'testuser',
-            name: 'test',
-            password: 'testpassword'
-        }
-
-        const response = await api.post('/api/users').send(user)
-            .expect(201)
-
-        const userForToken = {
-            username: user.username,
-            id: response.body.id
-        }
-
-        const token = jwt.sign(userForToken, process.env.SECRET)
+       const token = await helper.createUserAndToken();
 
         const newBlog = {
             title: 'Test blog',
@@ -84,8 +69,6 @@ describe('addition of a new blog', () => {        // We need test user for creat
             .post('/api/blogs')
             .send(newBlog)
             .set('Authorization',`Bearer ${token}`)
-            .set('Content-Type', 'application/json')
-            .set('Content-Length', JSON.stringify(newBlog).length)
             .expect(201)
         const blogsAtEnd = await helper.blogsInDb()
         expect(blogsAtEnd).toHaveLength(blogsAtStart.length +1)
@@ -94,22 +77,7 @@ describe('addition of a new blog', () => {        // We need test user for creat
     })
 
     test('If like count is not given, it is set to 0', async() => {
-        const user = {
-            username: 'testuser2',
-            name: 'test',
-            password: 'testpassword'
-        }
-
-        const response = await api.post('/api/users').send(user)
-            .expect(201)
-
-        const userForToken = {
-            username: user.username,
-            id: response.body.id
-        }
-
-        const token = jwt.sign(userForToken, process.env.SECRET)
-
+       const token = await helper.createUserAndToken()
         const newBlog2 = {
             title: 'Test blog',
             author: 'Teppo Testaaja',
@@ -119,8 +87,6 @@ describe('addition of a new blog', () => {        // We need test user for creat
             .post('/api/blogs')
             .send(newBlog2)
             .set('Authorization',`Bearer ${token}`)
-            .set('Content-Type', 'application/json')
-            .set('Content-Length', JSON.stringify(newBlog2).length)
             .expect(201)
 
 
