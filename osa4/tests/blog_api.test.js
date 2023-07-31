@@ -183,7 +183,8 @@ describe('deleting a blog', () => {
         //const nonExistingId = helper.nonExistingId();
         const token = await helper.createUserAndToken()
 
-        const nonExistingId = helper.nonExistingId();
+        const nonExistingId = `beae8875577e6dd2c2az`
+        //const nonExistingId = helper.nonExistingId();
         await api
             .delete(`/api/blogs/${nonExistingId}`)
             .set('Authorization',`Bearer ${token}`)
