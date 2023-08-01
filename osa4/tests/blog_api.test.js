@@ -58,7 +58,6 @@ describe('addition of a new blog', () => {
     test('Posting blogs works', async() => {
         const blogsAtStart = await helper.blogsInDb()
         const token = await helper.createUserAndToken();
-
         const newBlog = {
             title: 'Test blog',
             author: 'Teppo Testaaja',
