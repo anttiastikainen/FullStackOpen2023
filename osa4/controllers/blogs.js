@@ -25,6 +25,9 @@ blogsRouter.get('', async (request, response) => {
 
         if(body.title === undefined || body.url === undefined)
             response.status(400).end()
+        if(!request.token || !request.user){
+            return response.status(401).json({ error: 'Unauthorized' })
+        }
 /*
         const decodedToken = jwt.verify(request.token, process.env.SECRET)
             if (!decodedToken.id) {

@@ -132,6 +132,25 @@ describe('addition of a new blog', () => {
         expect(blogsAtEnd).toHaveLength(blogsAtStart.length)
     })
 
+test('If token is not given, 401 response is returned', async() => {
+        const newBlog4 = {
+            title: 'No url blog',
+            author: 'Teppo Testaaja',
+            url: '',
+            likes: 30
+        }
+        const blogsAtStart = await helper.blogsInDb()
+        //const token = await helper.createUserAndToken()
+
+        await api 
+            .post('/api/blogs')
+            .send(newBlog4)
+            //.set('Authorization', `Bearer ${token}`)
+            .expect(401)
+        const blogsAtEnd = await helper.blogsInDb()
+        expect(blogsAtEnd).toHaveLength(blogsAtStart.length)
+    })
+
 })
 
 describe('deleting a blog', () => {
