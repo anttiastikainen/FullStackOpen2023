@@ -2,12 +2,17 @@ import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import ErrorNotification from './components/Error'
+import Notification from './components/Notification'
 
 const App = () => {
     const [blogs, setBlogs] = useState([])
     const [newTitle, setNewTitle] = useState('')
     const [newAuthor, setNewAuthor] = useState('')
     const [newUrl, setNewUrl] = useState('')
+    const [errorMessage, setErrorMessage] = useState(null)
+    const [notification, setNotification] = useState(null)
+
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [user, setUser] = useState(null)
@@ -66,7 +71,10 @@ const App = () => {
             setUsername('')
             setPassword('')
         } catch (exception) {
-
+            setErrorMessage('wrong username or password')
+            setTimeout(() => {
+                setErrorMessage(null)
+            }, 5000)
         }
     }
 
@@ -87,10 +95,23 @@ const App = () => {
             .create(blogObject)
             .then(returnedBlog => {
                 setBlogs(blogs.concat(returnedBlog))
+                setNotification(`a new blog ${newTitle} by ${newAuthor} added`)
                 setNewTitle('')
                 setNewAuthor('')
                 setNewUrl('')
+            setTimeout(() => {
+                setNotification(null)
+            }, 5000)
+
             })
+        .catch(error=> {
+            console.log(error.message)
+            setErrorMessage('Fill all the textfields to add blog!')
+            setTimeout(() => {
+                setErrorMessage(null)
+            }, 5000)
+        })
+
     }
 
     const handleTitleChange = (event) => {
@@ -138,6 +159,7 @@ const App = () => {
         return (
             <div>
             <h2> Log in to application</h2>
+            <ErrorNotification message={errorMessage} />
             {loginForm()}
             </div>
         )
@@ -146,6 +168,8 @@ const App = () => {
     return (
         <div>
         <h2>blogs</h2>
+        <Notification message={notification} />
+        <ErrorNotification message={errorMessage} />
         <p>{user.name} logged in        
         <button onClick={() => logOffUser() }>logout</button>
         </p>
