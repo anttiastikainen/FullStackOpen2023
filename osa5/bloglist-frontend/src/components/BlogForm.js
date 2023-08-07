@@ -18,25 +18,6 @@ const BlogForm = ({ createBlog }) => {
         setNewUrl('')
     }
 
-    /*
-    const handleTitleChange = (event) => {
-        setNewTitle(event.target.value)
-    }
-
-    const handleAuthorChange = (event) => {
-        setNewAuthor(event.target.value)
-    }
-
-    const handleUrlChange = (event) => {
-        setNewUrl(event.target.value)
-    }
-
-    const handleSubmit = (event) => {
-        event.preventDefault()
-        addBlog(event)
-    }
-    */
-
     return (
         <div>
         <h2>create new</h2>
