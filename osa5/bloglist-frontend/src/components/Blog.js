@@ -12,9 +12,13 @@ const blogStyle = {
 }
 
  const [showData, setShowData] = useState(false)
+ const [buttonText, setButtonText] = useState('View')
 
 const showBlog = ()=> {
 setShowData(!showData)
+    if(!showData)
+setButtonText('Hide')
+    else setButtonText('View')
 }
 
 return(
@@ -27,7 +31,7 @@ return(
         <p>{blog.user.username}</p>
             </div>
     )}
-        <button onClick={showBlog}>View</button>
+        <button onClick={showBlog}>{buttonText}</button>
         </div>
     )
 }

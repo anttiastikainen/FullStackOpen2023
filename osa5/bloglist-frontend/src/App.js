@@ -22,9 +22,7 @@ const App = () => {
     const blogFormRef = useRef()
 
     useEffect(() => {
-        blogService.getAll().then(blogs =>
-            setBlogs( blogs )
-        )  
+        refreshBlogs()
     }, [])
 
     useEffect(() => {
@@ -35,6 +33,11 @@ const App = () => {
             blogService.setToken(user.token)
         }
     }, [])
+
+    const refreshBlogs = () => {
+        blogService.getAll().then(blogs =>
+            setBlogs( blogs ))
+    }
 
     
     const loginForm = () => {
@@ -94,6 +97,7 @@ const App = () => {
             .create(blogObject)
             .then(returnedBlog => {
                 setBlogs(blogs.concat(returnedBlog))
+                refreshBlogs()
                 setNotification(`a new blog ${returnedBlog.title} by ${returnedBlog.author} added`)
             setTimeout(() => {
                 setNotification(null)
@@ -127,7 +131,7 @@ const App = () => {
         <p>{user.name} logged in        
         <button onClick={() => logOffUser() }>logout</button>
         </p>
-        <Togglable buttonLabel="new blog" ref={blogFormRef}>
+        <Togglable buttonLabel="create new blog" ref={blogFormRef}>
         <BlogForm createBlog={addBlog} />
         </Togglable>
         {blogs.map(blog =>
