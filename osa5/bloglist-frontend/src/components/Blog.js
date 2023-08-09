@@ -44,6 +44,18 @@ try {
     
 }
 
+const removeBlog = async(event) => {
+    event.preventDefault()
+    const token = blogService.getToken()
+    
+    try {
+        await blogService
+            .remove(blog.id, token , blog.title)
+    } catch (error) {
+        console.log(error.data)
+    }
+}
+
 return(
   <div style={blogStyle}>
     {blog.title} {blog.author}
@@ -54,6 +66,7 @@ return(
         <button onClick={addLike}>like</button>
         </p>
         <p>{blog.user.username}</p>
+        <p><button onClick={removeBlog}>remove</button></p>
             </div>
     )}
         <button onClick={showBlog}>{buttonText}</button>
