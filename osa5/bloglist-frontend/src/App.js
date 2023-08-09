@@ -34,9 +34,15 @@ const App = () => {
         }
     }, [])
 
-    const refreshBlogs = () => {
+    const refreshBlogs = async () => {
         blogService.getAll().then(blogs =>
-            setBlogs( blogs ))
+            setBlogs( sortBlogs(blogs)))
+    }
+
+    const sortBlogs = (blogs) => {
+        let sortedBlogs = blogs.sort(
+            (blog1, blog2) => (blog1.likes < blog2.likes) ? 1 : (blog1.likes > blog2.likes) ? -1 : 0)
+        return sortedBlogs
     }
 
     
@@ -97,7 +103,6 @@ const App = () => {
             .create(blogObject)
             .then(returnedBlog => {
                 setBlogs(blogs.concat(returnedBlog))
-                refreshBlogs()
                 setNotification(`a new blog ${returnedBlog.title} by ${returnedBlog.author} added`)
             setTimeout(() => {
                 setNotification(null)
