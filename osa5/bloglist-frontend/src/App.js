@@ -107,7 +107,7 @@ const App = () => {
             setTimeout(() => {
                 setNotification(null)
             }, 5000)
-
+        refreshBlogs()
             })
         .catch(error=> {
             console.log(error.message)
