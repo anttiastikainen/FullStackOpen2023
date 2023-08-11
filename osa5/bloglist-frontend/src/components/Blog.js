@@ -57,7 +57,7 @@ const Blog = ({ blog }) => {
   }
 
   return(
-    <div style={blogStyle} className='blog'>
+    <div style={blogStyle}>
       {blog.title} - {blog.author}
       {showData && (
         <div>
