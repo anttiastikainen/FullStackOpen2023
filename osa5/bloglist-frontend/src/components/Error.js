@@ -1,13 +1,19 @@
-const ErrorNotification = ({ message }) => {
-    if (message === null) {
-        return null
-    }
+import PropTypes from 'prop-types'
 
-    return (
-        <div className="error">
-        {message}
-        </div>
-    )
+const ErrorNotification = ({ message }) => {
+  if (message === null) {
+    return null
+  }
+
+  return (
+    <div className="error">
+      {message}
+    </div>
+  )
+}
+
+ErrorNotification.propTypes = {
+  message: PropTypes.string
 }
 
 export default ErrorNotification

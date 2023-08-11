@@ -1,77 +1,92 @@
-import {useState } from 'react'
+import { useState } from 'react'
 import blogService from '../services/blogs'
+import PropTypes from 'prop-types'
 
-const Blog = ({blog}) => {
+const Blog = ({ blog }) => {
 
-const blogStyle = {
+  const blogStyle = {
     paddingTop: 10,
     paddingLeft: 3,
-    border: 2,
-    border: 'solid',
+    border: '2px solid',
     borderWidth: 1,
     marginBottom: 5
-}
+  }
 
- const [showData, setShowData] = useState(false)
- const [buttonText, setButtonText] = useState('View')
- const [likes, setLikes] = useState(blog.likes)
+  const [showData, setShowData] = useState(false)
+  const [buttonText, setButtonText] = useState('View')
+  const [likes, setLikes] = useState(blog.likes)
 
-const showBlog = ()=> {
-setShowData(!showData)
+  const showBlog = () => {
+    setShowData(!showData)
     if(!showData)
-setButtonText('Hide')
+      setButtonText('Hide')
     else setButtonText('View')
-}
+  }
 
-const addLike = async(event) => {
+  const addLike = async(event) => {
     event.preventDefault()
     const newLikes = likes+1
     const blogObject = {
-        url: blog.url,
-        title: blog.title,
-        author: blog.author,
-        user: blog.user.id,
-        likes: newLikes,
-        id: blog.id
+      url: blog.url,
+      title: blog.title,
+      author: blog.author,
+      user: blog.user.id,
+      likes: newLikes,
+      id: blog.id
     }
-try {
-    setLikes(newLikes)
-    await blogService
+    try {
+      setLikes(newLikes)
+      await blogService
         .update(blog.id,blogObject)
-} catch (error){
-    console.log(error.data)
-}
-    
-}
+    } catch (error){
+      console.log(error.data)
+    }
 
-const removeBlog = async(event) => {
+  }
+
+  const removeBlog = async(event) => {
     event.preventDefault()
     const token = blogService.getToken()
-    
+
     try {
-        await blogService
-            .remove(blog.id, token , blog.title)
+      await blogService
+        .remove(blog.id, token , blog.title)
     } catch (error) {
-        console.log(error.data)
+      console.log(error.data)
     }
+  }
+
+  return(
+    <div style={blogStyle}>
+      {blog.title} {blog.author}
+      {showData && (
+        <div>
+          <p> {blog.url}</p>
+          <p>likes: {likes}
+            <button onClick={addLike}>like</button>
+          </p>
+          <p>{blog.user.username}</p>
+          <p><button onClick={removeBlog}>remove</button></p>
+        </div>
+      )}
+      <button onClick={showBlog}>{buttonText}</button>
+    </div>
+  )
 }
 
-return(
-  <div style={blogStyle}>
-    {blog.title} {blog.author}
-    {showData && (
-        <div>
-        <p> {blog.url}</p>
-        <p>likes: {likes}
-        <button onClick={addLike}>like</button>
-        </p>
-        <p>{blog.user.username}</p>
-        <p><button onClick={removeBlog}>remove</button></p>
-            </div>
-    )}
-        <button onClick={showBlog}>{buttonText}</button>
-        </div>
-    )
+Blog.propTypes = {
+  blog: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    author: PropTypes.string.isRequired,
+    url: PropTypes.string.isRequired,
+    likes: PropTypes.number.isRequired,
+    user: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      username: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+    }).isRequired,
+  }).isRequired
 }
 
 export default Blog
