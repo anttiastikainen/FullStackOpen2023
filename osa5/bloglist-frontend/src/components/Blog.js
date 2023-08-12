@@ -58,10 +58,14 @@ const Blog = ({ blog }) => {
 
   return(
     <div style={blogStyle}>
-      {blog.title} {blog.author}
+      {blog.title} - {blog.author}
       {showData && (
         <div>
-          <p> {blog.url}</p>
+          <p>
+            <a href={blog.url} target="_blank" rel="noopener noreferrer">
+              {blog.url}
+            </a>
+          </p>
           <p>likes: {likes}
             <button onClick={addLike}>like</button>
           </p>
@@ -81,11 +85,6 @@ Blog.propTypes = {
     author: PropTypes.string.isRequired,
     url: PropTypes.string.isRequired,
     likes: PropTypes.number.isRequired,
-    user: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      username: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-    }).isRequired,
   }).isRequired
 }
 
