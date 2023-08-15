@@ -25,6 +25,9 @@ const CountryInfo = (props) => {
             {props.flag && <img src={props.flag} alt="Flag" />}
             </div>
         )}
+        <p>
+        Weather in {props.capital}
+        </p>
         </div>
     )
 }
