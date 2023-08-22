@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import ErrorNotification from './components/Error'
 import Notification from './components/Notification'
 import LoginForm from './components/LoginForm'
+import BlogForm from './components/BlogForm'
+import Togglable from './components/Togglable'
 
 const App = () => {
   const [loginVisible, setLoginVisible] = useState(false)
@@ -17,6 +19,8 @@ const App = () => {
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
 
+  const blogFormRef = useRef()
+
   useEffect(() => {
     refreshBlogs()  
   }, [])
@@ -26,6 +30,7 @@ const App = () => {
       if (loggedUserJSON) {
           const user = JSON.parse(loggedUserJSON)
           setUser(user)
+          console.log(user.name)
           blogService.setToken(user.tokeni)
 }
 }, [])
@@ -91,6 +96,27 @@ const App = () => {
         window.localStorage.removeItem('loggedBlogappUser')
     }
 
+    const addBlog = (blogObject) => {
+        blogFormRef.current.toggleVisibility()
+        blogService
+        .create(blogObject)
+        .then(returnedBlog => {
+            setBlogs(blogs.concat(returnedBlog))
+            setNotification(`a new blog ${returnedBlog.title} by ${returnedBlog.author} added`)
+            setTimeout(() => {
+                setNotification(null)
+            }, 5000)
+            refreshBlogs()
+        })
+        .catch(error => {
+            console.log(error.message)
+            setErrorMessage('Fill all the textfields to add blog!')
+            setTimeout(() => {
+                setErrorMessage(null)
+            }, 5000)
+        })
+    }
+
     if (user === null) {
         return (
             <div>
@@ -101,11 +127,17 @@ const App = () => {
         )
     }
 
-
-
   return (
     <div>
       <h2>blogs</h2>
+      <Notification message={notification} />
+      <ErrorNotification message={errorMessage} />
+      <p>{user.name} logged in
+      <button onClick={() => logOffUser() }>logout</button>
+      </p>
+      <Togglable buttonLabel="create new blog" ref={blogFormRef}>
+      <BlogForm createBlog={addBlog} />
+      </Togglable>
       {blogs.map(blog =>
         <Blog key={blog.id} blog={blog} />
       )}
