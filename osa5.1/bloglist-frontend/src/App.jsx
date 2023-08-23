@@ -31,7 +31,7 @@ const App = () => {
           const user = JSON.parse(loggedUserJSON)
           setUser(user)
           console.log(user.name)
-          blogService.setToken(user.tokeni)
+          blogService.setToken(user.token)
 }
 }, [])
 
