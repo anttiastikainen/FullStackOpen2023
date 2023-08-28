@@ -31,7 +31,7 @@ const update = async (id,newObject) => {
 }
 
 const remove = async (id, token, blogName) => {
-    console.log(token)
+  console.log(token)
   if(window.confirm(`Do you really want to remove ${blogName} blog?`))
   {
     const config = {
