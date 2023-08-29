@@ -1,43 +1,68 @@
 import React from 'react'
 import '@testing-library/jest-dom'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import Blog from './Blog'
 
-test('renders blog content', () => {
+describe('Blog tests', () => {
+
+test('renders blog title and author', () => {
   const blog = {
     id: '123',
-    title: 'Example Blog',
-    author: 'John Doe',
-    url: 'http://example.com',
-    likes: 5
+    title: 'testi blog',
+    author: 'Teppo Taputtaja',
+    url: 'http://google.com',
+    likes: 5,
+    user: {
+    id: '456',
+    username: 'testuser',
+    name: 'Test User'
+    }
+
   }
 
   render(<Blog blog={blog} />)
 
-  const titleElement = screen.getByText('Example Blog - John Doe')
+  const titleElement = screen.getByText('testi blog - Teppo Taputtaja')
   expect(titleElement).toBeInTheDocument()
 
 })
 
+test('renders children after button pressed', async () => {
 
-
-test('clicking the "View" button shows additional information', () => {
-  const blog = {
+    const user = userEvent.setup()
+    const blog = {
     id: '123',
-    title: 'Example Blog',
-    author: 'John Doe',
-    url: 'http://example.com',
+    title: 'testi blog',
+    author: 'Teppo Taputtaja',
+    url: 'http://google.com',
     likes: 5,
     user: {
-      id: 'user123',
-      username: 'john'
+    id: '456',
+    username: 'testuser',
+    name: 'Test User'
     }
-  }
+    }
 
-  render(<Blog blog={blog} />)
+    const { container } = render(<Blog blog={blog} />)
 
-  const viewButton = screen.getByText('View')
-  fireEvent.click(viewButton)
+    const button = screen.getByText('View')
+
+    await user.click(button)
+
+    const div = container.querySelector('.blog')
+    expect(div).toHaveStyle('display: block')
+
+  const linkElement = screen.getByRole('link', { name: 'http://google.com' });
+  expect(linkElement).toHaveAttribute('href', 'http://google.com');
+
+    const likesText = screen.getByText('likes: 5')
+    expect(likesText).toBeVisible()
+
+    const userText = screen.getByText('testuser')
+    expect(userText).toBeVisible()
+
 
 })
 
+})
