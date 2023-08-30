@@ -1,6 +1,6 @@
 import React from 'react'
 import '@testing-library/jest-dom'
-import { render, screen } from '@testing-library/react'
+import { render, screen,waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Blog from './Blog'
 
@@ -62,6 +62,43 @@ test('renders children after button pressed', async () => {
     const userText = screen.getByText('testuser')
     expect(userText).toBeVisible()
 
+
+})
+
+test('test if event handler is called twice when button is pressed twice', async () => {
+
+    const user = userEvent.setup()
+    const blog = {
+    id: '123',
+    title: 'testi blog',
+    author: 'Teppo Taputtaja',
+    url: 'http://google.com',
+    likes: 5,
+    user: {
+    id: '456',
+    username: 'testuser',
+    name: 'Test User'
+    }
+    }
+
+    const addLikeMock = jest.fn()
+
+    render(<Blog blog={blog} addLike={addLikeMock} />)
+
+    const viewButton = screen.getByText('View')
+
+    await user.click(viewButton)
+
+    const likeButton = screen.getByText('like')
+    expect(likeButton).toBeVisible()
+
+
+  await waitFor(() => {
+    userEvent.click(likeButton);
+    userEvent.click(likeButton);
+  });
+
+    expect(addLikeMock).toHaveBeenCalledTimes(2)
 
 })
 

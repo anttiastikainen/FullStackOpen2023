@@ -118,6 +118,27 @@ const App = () => {
       })
   }
 
+ const addLikeOf = async (id)  => {
+    const blog = blogs.find((n) => n.id === id)
+    const updatedLikes = blog.likes + 1 
+    const changedBlog = { ...blog, likes: updatedLikes }
+
+     setBlogs((prevBlogs) =>
+         prevBlogs.map((blog) => (blog.id !== id ? blog : changedBlog))
+     )
+    
+    try {
+      await blogService
+        .update(id,changedBlog).then(returnedBlog => {
+            setBlogs(blogs.map(blog => blog.id !== id ? blog : returnedBlog))
+            refreshBlogs()
+        })
+    } catch (error){
+      console.log(error.data)
+    }
+
+  }
+
   if (user === null) {
     return (
       <div>
@@ -140,7 +161,7 @@ const App = () => {
         <BlogForm createBlog={addBlog} />
       </Togglable>
       {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
+        <Blog key={blog.id} blog={blog} addLike={() => addLikeOf(blog.id)}/>
       )}
     </div>
   )

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import blogService from '../services/blogs'
 import PropTypes from 'prop-types'
 
-const Blog = ({ blog }) => {
+const Blog = ({ blog, addLike }) => {
 
   const blogStyle = {
     paddingTop: 10,
@@ -23,6 +23,11 @@ const Blog = ({ blog }) => {
     else setButtonText('View')
   }
 
+  const incrementLikes = () => {
+      const updatedLikes = likes + 1
+      setLikes(updatedLikes)
+  }
+/*
   const addLike = async(event) => {
     event.preventDefault()
     const newLikes = likes+1
@@ -43,7 +48,7 @@ const Blog = ({ blog }) => {
     }
 
   }
-
+*/
   const removeBlog = async(event) => {
     event.preventDefault()
     const token = blogService.getToken()
@@ -67,7 +72,7 @@ const Blog = ({ blog }) => {
             </a>
           </p>
           <p>likes: {likes}
-            <button onClick={addLike}>like</button>
+            <button onClick={() => {incrementLikes(), addLike()}}>like</button>
           </p>
           <p>{blog.user.username}</p>
           <p><button onClick={removeBlog}>remove</button></p>
