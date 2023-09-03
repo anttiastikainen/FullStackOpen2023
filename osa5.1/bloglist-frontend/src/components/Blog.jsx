@@ -24,31 +24,10 @@ const Blog = ({ blog, addLike }) => {
   }
 
   const incrementLikes = () => {
-      const updatedLikes = likes + 1
-      setLikes(updatedLikes)
+    const updatedLikes = likes + 1
+    setLikes(updatedLikes)
   }
-/*
-  const addLike = async(event) => {
-    event.preventDefault()
-    const newLikes = likes+1
-    const blogObject = {
-      url: blog.url,
-      title: blog.title,
-      author: blog.author,
-      user: blog.user.id,
-      likes: newLikes,
-      id: blog.id
-    }
-    try {
-      setLikes(newLikes)
-      await blogService
-        .update(blog.id,blogObject)
-    } catch (error){
-      console.log(error.data)
-    }
 
-  }
-*/
   const removeBlog = async(event) => {
     event.preventDefault()
     const token = blogService.getToken()
