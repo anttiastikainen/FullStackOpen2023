@@ -118,20 +118,20 @@ const App = () => {
       })
   }
 
- const addLikeOf = async (id)  => {
+  const addLikeOf = async (id)  => {
     const blog = blogs.find((n) => n.id === id)
-    const updatedLikes = blog.likes + 1 
+    const updatedLikes = blog.likes + 1
     const changedBlog = { ...blog, likes: updatedLikes }
 
-     setBlogs((prevBlogs) =>
-         prevBlogs.map((blog) => (blog.id !== id ? blog : changedBlog))
-     )
-    
+    setBlogs((prevBlogs) =>
+      prevBlogs.map((blog) => (blog.id !== id ? blog : changedBlog))
+    )
+
     try {
       await blogService
         .update(id,changedBlog).then(returnedBlog => {
-            setBlogs(blogs.map(blog => blog.id !== id ? blog : returnedBlog))
-            refreshBlogs()
+          setBlogs(blogs.map(blog => blog.id !== id ? blog : returnedBlog))
+          refreshBlogs()
         })
     } catch (error){
       console.log(error.data)
