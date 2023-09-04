@@ -1,43 +1,56 @@
 describe('Blog app', function(){
   beforeEach(function() {
-      cy.request('GET', 'http://localhost:3003/api/users')
+      cy.request('POST', 'http://localhost:3003/api/testing/reset')
       const user = {
-          name: 'Antti Astikainen',
-          username: 'AnttiA',
-          password: 'salasana'
+          name: 'Cypress Tester',
+          username: 'cypressBot',
+          password: 'password'
       }
-      //cy.request('POST', 'http://localhost:3003/api/users/', user)
-      cy.request('GET', 'http://localhost:3003/api/users')
+      cy.request('POST', 'http://localhost:3003/api/users/', user)
       cy.visit('http://localhost:3001')
   })
 
-  it('front page can be opened', function() {
+  it('Login form is shown', function() {
     cy.visit('http://localhost:3001')
     cy.contains('Log in to application')
   })
 
-  it('login form can be opened', function() {
+  describe('Login', function() {
+      
+  it('succeeds with correct credentials', function() {
       cy.contains('log in').click()
-  })
-
-  it('user can login', function() {
-      cy.contains('log in').click()
-      cy.get('#username').type('AnttiA')
-      cy.get('#password').type('salasana')
+      cy.get('#username').type('cypressBot')
+      cy.get('#password').type('password')
       cy.get('#login-button').click()
 
-      cy.contains('Antti Astikainen logged in')
+      cy.contains('Cypress Tester logged in')
+    })
+
+  it('fails with wrong credentials', function() {
+      cy.contains('log in').click()
+      cy.get('#username').type('cypressBot')
+      cy.get('#password').type('salasana')
+      cy.get('#login-button').click()
+      
+      cy.get('.error')
+          .should('contain','wrong username or password')
+         .should('have.css', 'color', 'rgb(255, 0, 0)')
+          .should('have.css', 'border-style', 'solid')
+         
+      cy.get('html').should('not.contain', 'Cypress Tester logged in')
+    })
+
   })
 
 describe('when logged in', function() {
     beforeEach(function() {
         cy.contains('log in').click()
-        cy.get('#username').type('AnttiA')
-        cy.get('#password').type('salasana')
+        cy.get('#username').type('cypressBot')
+        cy.get('#password').type('password')
         cy.get('#login-button').click()
     })
 
-  it('a new blog can be created', function() {
+  it('A blog can be created', function() {
       cy.contains('create new blog').click()
       cy.get('#title').type('a blog created by cypress')
       cy.get('#author').type('cypress author')
