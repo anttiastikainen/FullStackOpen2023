@@ -57,7 +57,7 @@ const Blog = ({ blog, addLike }) => {
           <p><button onClick={removeBlog}>remove</button></p>
         </div>
       )}
-      <button onClick={showBlog}>{buttonText}</button>
+      <button id="view-button" onClick={showBlog}>{buttonText}</button>
     </div>
   )
 }
