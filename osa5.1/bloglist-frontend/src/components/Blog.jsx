@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import PropTypes from 'prop-types'
 
-const Blog = ({ blog, addLike, removeBlog }) => {
+const Blog = ({ blog, addLike, removeBlog, user }) => {
 
   const blogStyle = {
     paddingTop: 10,
@@ -41,7 +41,9 @@ const Blog = ({ blog, addLike, removeBlog }) => {
             <button onClick={() => {incrementLikes(), addLike()}}>like</button>
           </p>
           <p>{blog.user.username}</p>
+          {user && user.username === blog.user.username && (
           <p><button onClick={removeBlog}>remove</button></p>
+          )}
         </div>
       )}
       <button id="view-button" onClick={showBlog}>{buttonText}</button>

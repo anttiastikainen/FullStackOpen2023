@@ -31,7 +31,6 @@ const App = () => {
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
-      console.log(user.name)
       blogService.setToken(user.token)
     }
   }, [])
@@ -179,7 +178,8 @@ const App = () => {
         <Blog key={blog.id}
           blog={blog}
           addLike={() => addLikeOf(blog.id)}
-          removeBlog={() => handleRemoveBlog(blog.id)}/>
+          removeBlog={() => handleRemoveBlog(blog.id)}
+          user={user}/>
       )}
     </div>
   )
