@@ -1,8 +1,7 @@
 import { useState } from 'react'
-import blogService from '../services/blogs'
 import PropTypes from 'prop-types'
 
-const Blog = ({ blog, addLike }) => {
+const Blog = ({ blog, addLike, removeBlog }) => {
 
   const blogStyle = {
     paddingTop: 10,
@@ -26,18 +25,6 @@ const Blog = ({ blog, addLike }) => {
   const incrementLikes = () => {
     const updatedLikes = likes + 1
     setLikes(updatedLikes)
-  }
-
-  const removeBlog = async(event) => {
-    event.preventDefault()
-    const token = blogService.getToken()
-
-    try {
-      await blogService
-        .remove(blog.id, token , blog.title)
-    } catch (error) {
-      console.log(error.data)
-    }
   }
 
   return(

@@ -139,6 +139,21 @@ const App = () => {
 
   }
 
+  const handleRemoveBlog = async (id) => {
+      const token = blogService.getToken() 
+      const blog = blogs.find((n) => n.id === id)
+
+      try {
+          await blogService
+          .remove(blog.id, token, blog.title)
+          refreshBlogs()
+      } catch (error) {
+          console.log(error.data)
+      }
+  }
+    
+
+
   if (user === null) {
     return (
       <div>
@@ -161,7 +176,10 @@ const App = () => {
         <BlogForm createBlog={addBlog} />
       </Togglable>
       {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} addLike={() => addLikeOf(blog.id)}/>
+        <Blog key={blog.id}
+          blog={blog}
+          addLike={() => addLikeOf(blog.id)}
+          removeBlog={() => handleRemoveBlog(blog.id)}/>
       )}
     </div>
   )
