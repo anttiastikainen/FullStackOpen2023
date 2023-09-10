@@ -43,10 +43,25 @@ describe('when logged in', function() {
     beforeEach(function() {
       cy.login({ username: 'cypressBot' ,password: 'password' })
 
-      cy.createBlog({ title: 'a test blog',author: 'test author', url: 'www.testurl.fi'})
-      cy.createBlog({ title: 'a second test blog',author: 'test author', url: 'www.testurl.fi'})
-      cy.createBlog({ title: 'a third test blog',author: 'test author', url: 'www.testurl.fi'})
+      cy.createBlog({ 
+          title: 'a test blog',
+          author: 'test author',
+          url: 'www.testurl.fi',
+          likes: 3
+      })
 
+      cy.createBlog({
+          title: 'a second test blog',
+          author: 'test author',
+          url: 'www.testurl.fi',
+          likes: 0
+      })
+
+      cy.createBlog({ title: 'a third test blog',
+          author: 'test author',
+          url: 'www.testurl.fi',
+          likes: 1
+      })
     })
 
   it('A blog can be created', function() {
@@ -60,7 +75,7 @@ describe('when logged in', function() {
   it('A blog can be liked', function() {
       cy.contains('View').click()
       cy.contains('like').click()
-      cy.contains('likes: 1')
+      cy.contains('likes: 4')
     })
 
   it('Blog creator can remove blog', function() {
@@ -74,6 +89,8 @@ describe('when logged in', function() {
 
       cy.visit('http://localhost:3001')
 
+      cy.wait(500)
+
       cy.get('.blog').should('have.length', 2)
 
      })
@@ -85,6 +102,12 @@ describe('when logged in', function() {
         cy.get('#view-button').click()
         cy.contains('remove').should('not.exist')
      })
+
+    it('The blogs are in order by their likes counts', function() {
+        cy.get('.blog').eq(0).should('contain', 'a test blog')
+        cy.get('.blog').eq(1).should('contain', 'a third test blog')
+        cy.get('.blog').eq(2).should('contain', 'a second test blog')
+    })
 
   })
 })
