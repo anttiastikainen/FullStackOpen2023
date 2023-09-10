@@ -15,7 +15,8 @@ describe('Blog app', function(){
       }
 
       cy.request('POST', 'http://localhost:3001/api/users/', secondUser)
-      cy.visit('http://localhost:3001')
+     cy.visit('http://localhost:3001')
+
   })
 
   it('Login form is shown', function() {
@@ -52,10 +53,12 @@ describe('Blog app', function(){
 
 describe('when logged in', function() {
     beforeEach(function() {
-        cy.contains('log in').click()
-        cy.get('#username').type('cypressBot')
-        cy.get('#password').type('password')
-        cy.get('#login-button').click()
+        cy.login({ username: 'cypressBot' ,password: 'password' })
+
+      cy.createBlog({ title: 'a test blog',author: 'test author', url: 'www.testurl.fi'})
+      cy.createBlog({ title: 'a second test blog',author: 'test author', url: 'www.testurl.fi'})
+      cy.createBlog({ title: 'a third  test blog',author: 'test author', url: 'www.testurl.fi'})
+
     })
 
   it('A blog can be created', function() {
@@ -91,18 +94,8 @@ describe('when logged in', function() {
      })
 
     it('The remove button is not shown to another user', function() {
-      cy.contains('create new blog').click()
-      cy.get('#title').type('a blog created by cypress')
-      cy.get('#author').type('cypress author')
-      cy.get('#url').type('https://www.cypress.io')
-      cy.get('#create-button').click()
+    cy.login({ username: 'cypressBot2' ,password: 'password2' })
 
-      cy.contains('logout').click()
-
-        cy.get('#username').type('cypressBot2')
-        cy.get('#password').type('password2')
-        cy.get('#login-button').click()
- 
         cy.get('#view-button').click()
         cy.contains('remove').should('not.exist')
      })
