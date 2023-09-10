@@ -44,3 +44,18 @@ Cypress.Commands.add('createBlog', ({ title, author, url }) => {
 
     cy.visit('http://localhost:3001')
 })
+
+Cypress.Commands.add('createUser', ({ name, username, password }) => {
+    cy.request('POST', 'http://localhost:3003/api/users/', {name, username, password})
+})
+/*
+      cy.request('POST', 'http://localhost:3003/api/users/', user)
+
+      const secondUser = {
+          name: 'Cypress Tester2',
+          username: 'cypressBot2',
+          password: 'password2'
+      }
+
+      cy.request('POST', 'http://localhost:3001/api/users/', secondUser)
+*/ 
