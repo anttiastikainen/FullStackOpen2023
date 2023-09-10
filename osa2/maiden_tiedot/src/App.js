@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import Country from './components/Country'
+import Weather from './components/Weather'
 
 const Filter = (props) => {
     return(
@@ -9,28 +10,32 @@ const Filter = (props) => {
 }
 
 const CountryInfo = (props) => {
-    return(
+    console.log(props.capital);
+    const formattedCapital = props.capital.replace('capital ', '')
+    return (
         <div>
-        <div>{props.capital}</div>  
-        <div>{props.area}</div>
-        <br/>
-        {props.languages && (
+            <div>{props.capital}</div>
+            <div>{props.area}</div>
+            <br />
+            {props.languages && (
+                <div>
+                    <strong>Languages:</strong>
+                    <ul>
+                        {props.languages.map((language) => (
+                            <li key={language}>{language}</li>
+                        ))}
+                    </ul>
+                    {props.flag && <img src={props.flag} alt="Flag" />}
+                </div>
+            )}
             <div>
-            <strong> Languages:</strong>
-            <ul>
-            {props.languages.map(language => (
-                <li key={language}>{language}</li>
-            ))}
-            </ul>
-            {props.flag && <img src={props.flag} alt="Flag" />}
+                Weather in {formattedCapital}
+                <Weather capital={formattedCapital} />
             </div>
-        )}
-        <p>
-        Weather in {props.capital}
-        </p>
         </div>
-    )
-}
+    );
+};
+
 
 
 function App() {
